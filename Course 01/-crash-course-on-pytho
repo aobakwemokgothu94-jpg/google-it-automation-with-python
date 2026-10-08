@@ -1,0 +1,91 @@
+# Track User Logins on Network Machines
+
+This project is part of the **Google IT Automation with Python Professional Certificate** (Crash Course on Python - Module 6). It provides a Python solution to process an event log containing user logins and logouts across various servers and workstations, ultimately generating a report of all users currently active on each machine.
+
+## Project Overview
+
+The objective is to process a list of system events to determine which users are currently logged into which machines. The script processes each log entry, tracks user sessions dynamically, and prints out a clean summary report.
+
+### Key Logic & Features
+- **Event Sorting:** Events are sorted automatically by chronological timestamp to ensure tracking accuracy.
+- **Edge Case Handling:** Includes safe tracking methods (`set.discard()`) to elegantly handle unexpected logout logs where a user might log out without a recorded login event, preventing runtime key or set errors.
+- **Dynamic Set Tracking:** Utilizes Python `set` structures per machine to ensure users are stored uniquely and removed effortlessly upon logging out.
+
+---
+
+## Code Structure
+
+The project consists of three main utility functions and an `Event` data model:
+
+1. **`get_event_date(event)`**: A helper function used as a sorting key to sort events chronologically.
+2. **`current_users(events)`**: Processes the collection of events, building a dictionary where keys are machine names and values are sets of active users.
+3. **`generate_report(machines)`**: Iterates over the tracked machines and prints a formatted report listing all currently logged-in users.
+4. **`Event` Class**: A lightweight data object that initializes event attributes (`date`, `type`, `machine`, `user`).
+
+---
+
+## Source Code
+
+```python
+class Event:
+    def __init__(self, event_date, event_type, machine_name, user):
+        self.date = event_date
+        self.type = event_type
+        self.machine = machine_name
+        self.user = user
+
+def get_event_date(event):
+    return event.date
+
+def current_users(events):
+    # Sort events chronologically before processing
+    events.sort(key=get_event_date)
+    machines = {}
+    
+    for event in events:
+        if event.machine not in machines:
+            machines[event.machine] = set()
+        
+        if event.type == "login":
+            machines[event.machine].add(event.user)
+        elif event.type == "logout":
+            # Using discard ensures no error is raised if the user wasn't in the set
+            machines[event.machine].discard(event.user)
+            
+    return machines
+
+def generate_report(machines):
+    for machine, users in machines.items():
+        if len(users) > 0:
+            user_list = ", ".join(users)
+            print(f"{machine}: {user_list}")
+
+# Sample Execution
+if __name__ == "__main__":
+    events = [
+        Event('2020-01-21 12:45:56', 'login', 'myworkstation.local', 'jordan'),
+        Event('2020-01-22 15:53:42', 'logout', 'webserver.local', 'jordan'),
+        Event('2020-01-21 18:53:21', 'login', 'webserver.local', 'lane'),
+        Event('2020-01-22 10:25:34', 'logout', 'myworkstation.local', 'jordan'),
+        Event('2020-01-21 08:20:01', 'login', 'webserver.local', 'jordan'),
+        Event('2020-01-23 11:24:35', 'logout', 'mailserver.local', 'chris'),
+    ]
+
+    users = current_users(events)
+    generate_report(users)
+```
+
+---
+
+## Sample Output
+
+When running the sample workflow above, the script calculates that `jordan` logged out of `webserver.local` and `myworkstation.local`, leaving only `lane` actively logged in:
+
+```text
+webserver.local: lane
+```
+
+## Setup & Requirements
+
+- **Python Version:** Python 3.x
+- **Environment:** Run as a standalone script via terminal or execute cell-by-cell inside a **Jupyter Notebook**.
