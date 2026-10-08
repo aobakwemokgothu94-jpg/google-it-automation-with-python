@@ -1,0 +1,24 @@
+📌 Algorithmic Time & Space Complexity
+Time Complexity: O(NlogN)
+
+The most computationally expensive step is sorting the list of events chronologically using events.sort(key=get_event_date), which takes O(NlogN) time, where N is the total number of events.
+
+The single-pass loop iterating through the sorted list processes each event in O(1) constant time.
+
+Space Complexity: O(U+M)
+
+Storing the active user sessions requires space proportional to the number of unique machines (M) and active logged-in users (U) stored inside the set objects.
+
+💡 Key Edge Cases Handled
+Out-of-Order Log Ingestion: Log entries in real-world systems rarely arrive in strict chronological order due to network latency. Sorting by timestamp upfront guarantees that session histories are processed correctly regardless of input sequence.
+
+Missing Login Logs (Orphaned Logouts): Using set.discard(user) instead of set.remove(user) prevents KeyError exceptions when processing a logout event for a user whose corresponding login was missing from the log window.
+
+Duplicate Login Events: Using Python set collections instead of list ensures user names remain unique per machine even if multiple login events for the same user occur consecutively.
+
+🚀 Suggested Enhancements for Scalability
+Dictionary Default Handling: Replace standard dict initialization logic with collections.defaultdict(set) to eliminate explicit key-existence checks (if event.machine not in machines).
+
+Timestamp Parsing: Upgrade the date attribute from plain string comparison to standard datetime.datetime objects to support flexible time formatting and cross-day delta calculations.
+
+Stream Processing: For real-time monitoring, replace full-list sorting with a priority queue or time-series database stream to process events dynamically as they arrive.
