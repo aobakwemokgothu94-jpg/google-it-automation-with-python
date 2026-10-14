@@ -1,0 +1,101 @@
+# Google IT Automation Lab: Handling Files & Report Generation
+
+An end-to-end documentation of the Python file parsing automation lab, mapping the migration from raw data sources to processed text-matrix corporate reports.
+
+## 📊 Overview
+
+This project implements a modular file-processing data pipeline using Python 3. The pipeline handles CSV cleaning via custom tracking dialects, aggregates department staffing frequencies using native collections, and outputs a formatted flat-text report.
+
+## 📁 Repository Structure
+
+* `scripts/generate_report.py` - Core execution script containing custom dialect configurations, processing loops, and file streams.
+* `data/employees.csv` - The input dataset mapping system usernames to corporate organizational branches.
+* `data/report.txt` - Generated text log delivering alphabetical department tallies.
+
+---
+
+## 🛠️ Lab Implementation & Iterative Milestones
+
+### Phase 1: Overcoming Terminal Truncation
+The script initialisation faced text clipping challenges when transferring boilerplate logic from text-stream environments inside the `nano 7.2` visual editor. Lines detailing file path locations and list definitions required manual syntax reconstruction to protect the structural logic of the system components.
+
+### Phase 2: Debugging Console Input Collisions
+During terminal execution, an accidental clipboard paste deposited Python code blocks natively inside a Bash execution shell environment:
+```bash
+student@1410e48498a2:~/scripts$ import csv
+-bash: import: command not found
+student@1410e48498a2:~/scripts$ def read_employees(csv_file_location):
+-bash: syntax error near unexpected token `('
+```
+This was successfully resolved by re-opening the file environment using `nano generate_report.py`, purging the active working layers, saving the file, and running the system through its proper interpreter path (`./generate_report.py`).
+
+### Phase 3: Final Production Pipeline
+The final production architecture uses a three-tier design pattern to separate operational responsibilities cleanly:
+
+```python
+#!/usr/bin/env python3
+import csv
+
+def read_employees(csv_file_location):
+    """Registers custom dialect flags to trim workspace strings and maps items."""
+    csv.register_dialect('empDialect', skipinitialspace=True, strict=True)
+    employee_file = csv.DictReader(open(csv_file_location), dialect='empDialect')
+    employee_list = []
+    for data in employee_file:
+        employee_list.append(dict(data))
+    return employee_list
+
+def process_data(employee_list):
+    """Isolates targets against unique department sets to tally frequencies."""
+    department_list = []
+    for employee_data in employee_list:
+        department_list.append(employee_data['Department'])
+    
+    department_data = {}
+    for department_name in set(department_list):
+        department_data[department_name] = department_list.count(department_name)
+    return department_data
+
+def write_report(dictionary, report_file):
+    """Outputs results in an alphabetically sorted colon-delimited format."""
+    with open(report_file, "w+") as f:
+        for k in sorted(dictionary.keys()):
+            f.write(str(k) + ':' + str(dictionary[k]) + '\n')
+
+if __name__ == "__main__":
+    employee_file_path = '/home/student/data/employees.csv'
+    report_file_path = '/home/student/data/report.txt'
+    
+    employee_list = read_employees(employee_file_path)
+    dictionary = process_data(employee_list)
+    write_report(dictionary, report_file_path)
+```
+
+---
+
+## 🚀 Execution & Verification
+
+To duplicate execution steps and review output generations within the virtual system node, execute these commands:
+
+```bash
+# 1. Assign local executable permission bits
+chmod +x generate_report.py
+
+# 2. Run the script through the environment interpreter
+./generate_report.py
+
+# 3. Change directory and view the completed file matrix
+cd ~/data
+cat report.txt
+```
+
+### Verified System Report Metrics (`report.txt`)
+```text
+Development:4
+Human Resources:2
+IT infrastructure:4
+Marketing:2
+Sales:3
+User Experience Research:2
+Vendor operations:2
+```
