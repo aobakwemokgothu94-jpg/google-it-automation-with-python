@@ -1,1 +1,63 @@
+# Email Domain Migration Script
 
+A production-ready Python automation tool designed to safely parse corporate records, identify legacy email domains, and seamlessly migrate user records to a target infrastructure domain using structured text processing and exact pattern matching.
+
+---
+
+## 📋 Features
+
+* **Regex-Driven Substring Identification:** Uses strict anchor matching to ensure only the trailing domain of the email string is updated without mutating individual usernames.
+* **Deterministic Tabular Processing:** Leverages native file handles and the standard `csv` library to safely translate data row-by-row.
+* **Data Integrity Architecture:** Outputs records into an independent production report file, preserving the original data footprint until validation is complete.
+
+---
+
+## ⚙️ Implementation & Validation
+
+### Prerequisites
+* Python 3.4+ or any contemporary interpreter standard.
+* Standard system access to shell utilities.
+
+### Execution Path
+Set file execution properties and execute the logic framework from the terminal:
+
+```bash
+# Assign execute permissions to the script
+chmod +x scripts/script.py
+
+# Execute the migration engine
+./scripts/script.py
+```
+
+### Verification Preview
+To evaluate the operational status after running the pipeline, check the contents of the target data directory:
+
+```bash
+# Verify the output baseline exists
+ls ~/data
+
+# Preview data transformations
+cat ~/data/updated_user_emails.csv
+```
+
+---
+
+## 📊 Processing Pipeline Preview
+
+### Input Baseline (`user_emails.csv`)
+```csv
+Full Name, Email Address
+Blossom Gill, blossom@abc.edu
+Hayes Delgado, nonummy@utnisia.com
+Petra Jones, ac@abc.edu
+Oleg Noel, noel@liberomauris.ca
+```
+
+### Output Evaluation (`updated_user_emails.csv`)
+```csv
+Full Name, Email Address
+Blossom Gill, blossom@xyz.edu
+Hayes Delgado, nonummy@utnisia.com
+Petra Jones, ac@xyz.edu
+Oleg Noel, noel@liberomauris.ca
+```
