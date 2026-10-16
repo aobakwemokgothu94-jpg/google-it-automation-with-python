@@ -1,0 +1,62 @@
+# Log Analysis Tool: Find Error
+
+A dynamic Python command-line tool designed to parse system and application logs, filter them dynamically using user-specified query criteria, and write matching error entries to a dedicated log file for root-cause analysis.
+
+## Features
+* **Case-Insensitive Query Matching:** Uses multiple exact and partial-match algorithms via regular expressions (`re`).
+* **Multi-Term Query Chaining:** Dynamically splits space-separated terms to verify that all requested constraints appear on the same log line.
+* **Auto-Scoping:** Isolates and extracts explicit log entry types (`ERROR`, `WARN`, `INFO`) seamlessly while outputting standardized telemetry.
+
+## File Structure
+```text
+├── data/
+│   ├── fishy.log          # Raw system input logs
+│   └── errors_found.log   # Extracted query logs (Generated)
+└── scripts/
+    └── find_error.py      # Main analysis tool
+```
+
+## Setup & Execution
+
+1. **Make the Script Executable:**
+   ```bash
+   chmod +x scripts/find_error.py
+   ```
+
+2. **Execute the Script:**
+   Pass the target log file path as the first positional command line argument:
+   ```bash
+   ./scripts/find_error.py ~/data/fishy.log
+   ```
+
+3. **Input Selection:**
+   When prompted, enter your targeted search string (e.g., `CRON ERROR Failed to start`).
+
+## How It Works
+1. The script establishes an immutable baseline filter targeting `"error"` flags.
+2. It breaks down user string inputs into an array of lowercased tokens.
+3. Every log entry is cross-referenced using `all(re.search(...))` loops to validate intersection metrics.
+4. Filtered matches are safely isolated and written directly to your environment's native storage path (`~/data/errors_found.log`).
+
+
+Terminal Previews
+
+
+1. Dynamic Script Execution Preview
+
+Below is a reproduction of how the terminal interaction looks when calling the script and entering your target parameters:
+text
+student@mycomputername:~/scripts$ ./find_error.py ~/data/fishy.log
+What is the error? CRON ERROR Failed to start
+
+[INFO] Log searching complete. Matches saved to ~/data/errors_found.log
+student@mycomputername:~/scripts$ _
+
+
+2. Output File Contents Preview
+
+When reading back the output file generated from the script execution above, this specific critical log entry is isolated from the rest of the text:
+text
+student@mycomputername:~/scripts$ cat ~/data/errors_found.log
+July 31 04:11:32 mycomputername CRON[51253]: ERROR: Failed to start CRON job due to script syntax error. Inform the CRON job owner!
+student@mycomputername:~/scripts$ _
