@@ -1,0 +1,187 @@
+# Python Email Lookup and Unit Testing
+
+## Project Overview
+
+This project demonstrates how to use Python to search for email addresses stored in a CSV file. It uses a dictionary for efficient lookups and unit tests to verify that the program handles valid names, missing parameters, and names that do not exist in the dataset.
+
+The project separates the email data from the lookup logic, making the script easy to maintain, test, and extend.
+
+## Objectives
+
+- Read names and email addresses from a CSV file.
+- Store email records in a Python dictionary.
+- Search for an email address using a person's first and last name.
+- Handle missing command-line arguments gracefully.
+- Return a meaningful message when an email address cannot be found.
+- Validate program behavior using Python's `unittest` framework.
+
+## Technologies Used
+
+- Python 3
+- CSV module
+- `sys` module
+- `unittest` framework
+- Linux command line
+
+## Project Structure
+
+```text
+/home/student/
+├── data/
+│   └── user_emails.csv
+└── scripts/
+    ├── emails.py
+    └── emails_test.py
+```
+
+## Dataset
+
+The `user_emails.csv` file contains names and their corresponding email addresses.
+
+Example:
+
+```csv
+Blossom Gill,blossom@abc.edu
+Hayes Delgado,nonummy@abc.edu
+Bree Campbell,breee@abc.edu
+Simon Rivera,sri@abc.edu
+```
+
+The program loads this information and converts the names to lowercase to support case-insensitive lookups.
+
+## Implementation
+
+### 1. Populate the Dictionary
+
+The `populate_dictionary()` function reads the CSV file and stores each person's name as a dictionary key and their email address as the corresponding value.
+
+```python
+def populate_dictionary(filename):
+    """Populate a dictionary with name/email pairs."""
+    email_dict = {}
+
+    with open(filename) as csvfile:
+        lines = csv.reader(csvfile, delimiter=",")
+        for row in lines:
+            name = str(row[0].lower())
+            email_dict[name] = row[1]
+
+    return email_dict
+```
+
+### 2. Find an Email Address
+
+The `find_email()` function receives command-line arguments, constructs a full name, and searches the dictionary for a matching email address.
+
+The expected behavior is:
+
+- Return the email address when a matching name exists.
+- Return `Missing parameters` when the required name arguments are absent.
+- Return `No email address found` when the name is not present in the dataset.
+
+### 3. Command-Line Execution
+
+The script accepts a first name and last name as command-line arguments.
+
+Example:
+
+```bash
+python3 emails.py Bree Campbell
+```
+
+Expected output:
+
+```text
+breee@abc.edu
+```
+
+Example with a name that is not in the dataset:
+
+```bash
+python3 emails.py Roy Cooper
+```
+
+Output:
+
+```text
+No email address found
+```
+
+## Unit Testing
+
+The project uses Python's built-in `unittest` module to test the email lookup functionality.
+
+The test file is `emails_test.py`.
+
+### Test Cases
+
+| Test | Input | Expected result |
+|---|---|---|
+| Basic lookup | `Bree Campbell` | `breee@abc.edu` |
+| Missing last name | `John` | `Missing parameters` |
+| Unknown name | `Roy Cooper` | `No email address found` |
+
+### Run the Tests
+
+From the scripts directory, run:
+
+```bash
+cd ~/scripts
+python3 -m unittest emails_test.py
+```
+
+Alternatively, if the test file is executable:
+
+```bash
+./emails_test.py
+```
+
+### Example Test Output
+
+A successful test run should look similar to this:
+
+```text
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.001s
+
+OK
+```
+
+The three dots indicate that all three test methods passed. The exact execution time may differ.
+
+## Error Handling
+
+The program handles common lookup errors:
+
+- **Missing parameters:** Returns a clear message when the first or last name is not supplied.
+- **Unknown names:** Returns `No email address found` when no matching record exists.
+- **Case-insensitive matching:** Converts names to lowercase before searching.
+
+These checks make the command-line utility more reliable and easier to use.
+
+## Results
+
+The observed terminal output confirms that an unknown name is handled correctly:
+
+```text
+$ python3 emails.py Roy Cooper
+No email address found
+```
+
+The unit tests also check that the email for Bree Campbell is returned correctly and that incomplete name input is handled.
+
+## Key Learnings
+
+- Reading CSV data with Python's `csv` module.
+- Using dictionaries for key-value lookups.
+- Processing command-line arguments with `sys.argv`.
+- Handling missing arguments and unsuccessful lookups.
+- Writing automated tests with `unittest`.
+- Running Python scripts and test suites in a Linux environment.
+
+## Conclusion
+
+This project demonstrates a practical approach to retrieving email addresses from a CSV dataset using Python. By combining dictionary-based lookups, input validation, and unit testing, the program provides a simple foundation for building more robust contact lookup tools.
+
+The implementation can be extended with input validation, duplicate-record handling, and additional tests
