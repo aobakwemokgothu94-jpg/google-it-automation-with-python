@@ -1,0 +1,83 @@
+
+Log Analysis with Regular Expressions
+
+
+📌 Project Overview
+
+This project contains an automated data-processing pipeline written in Python that parses system logs (syslog.log) from an internal ticketing service named ticky.
+The script uses advanced regular expressions to track operational statistics, identifies error trends, calculates service utilization metrics per user, and exports the data into clean CSV sheets. Finally, a companion script converts these CSV sheets into live, responsive HTML data tables for monitoring dashboards.
+
+🛠️ Features & Tasks Completed
+
+• Regex Log Parsing: Evaluates structural signatures for INFO and ERROR alerts while capturing explicit messages and target usernames.
+• Data Aggregation: Collects total counts for unique error types and builds split user metric mappings (INFO vs ERROR counts).
+• Sorted Data Pipeline:
+	• Organises systemic errors from most frequent to least frequent.
+	• Organises user statistics alphabetically by account names.
+• Reporting & Visualization: Generates standard CSV reports and translates them cleanly into interactive HTML tables.
+
+📂 File Architecture
+
+text
+├── syslog.log          # Raw system log containing service events
+├── ticky_check.py      # Core Python parser & metrics aggregator (Created)
+├── csv_to_html.py      # CSV engine to HTML generator utility
+├── error_message.csv   # Target spreadsheet: System error frequencies
+├── user_statistics.csv # Target spreadsheet: Usage data per team member
+└── /var/www/html/      # Web server directory hosting final dashboards
+    ├── error_message.html
+    └── user_statistics.html
+Use code with caution.
+
+🚀 Execution & Setup Guide
+
+
+1. Make the scripts executable
+
+bash
+chmod +x ticky_check.py csv_to_html.py
+Use code with caution.
+
+2. Run the processing automation pipeline
+
+bash
+sudo ./ticky_check.py
+Use code with caution.
+
+3. Generate the web dashboard metrics
+
+bash
+sudo ./csv_to_html.py error_message.csv /var/www/html/error_message.html
+sudo ./csv_to_html.py user_statistics.csv /var/www/html/user_statistics.html
+Use code with caution.
+
+📊 Dashboard Previews
+
+
+📋 1. Error Message Frequency Report (error_message.html)
+
+This table identifies systemic software issues, sorted directly by priority (most frequent blockages down to anomalies).
+
+Error	Count
+Timeout while retrieving information	15
+Connection to DB failed	12
+Tried to add information to closed ticket	12
+Permission denied while closing ticket	10
+The ticket was modified while updating	7
+Ticket doesn't exist	6
+
+
+👥 2. User Statistics Report (user_statistics.html)
+
+Tracks resource utilization, tracking which team members interact with the ticketing architecture successfully versus who encounters access constraints.
+
+Username	INFO	ERROR
+ac	2	2
+ahmed.miller	1	3
+blossom	2	4
+bpacheco	0	2
+breee	1	3
+enim.non	2	2
+flavia	0	5
+jackowens	2	3
+
