@@ -1,0 +1,193 @@
+# Python Food Scripts — Counting, Debugging & Git Branching
+
+## Project Overview
+
+This project uses Python scripts and Git version control to analyze a list of favorite foods. It demonstrates how to count food preferences, ask users to select a favorite food, debug Python errors, and manage changes through Git commits and branches.
+
+## Objectives
+
+- Read food preferences from a text file.
+- Count how many times each food appears.
+- Sort food counts from most popular to least popular.
+- Ask users to select their favorite food.
+- Fix `NameError` issues caused by incorrect variable names.
+- Track changes using Git.
+- Create and merge changes from a feature branch.
+
+## Technologies Used
+
+- Python 3
+- Git
+- Linux terminal
+- Text files
+
+## Project Files
+
+| File | Purpose |
+|---|---|
+| `favorite_foods.log` | Contains the list of favorite foods |
+| `food_count.py` | Counts and displays the frequency of each food |
+| `food_question.py` | Asks the user for a favorite food and displays how many friends like it |
+
+## 1. Counting Favorite Foods
+
+The `food_count.py` script reads `favorite_foods.log`, stores food counts in a Python dictionary, sorts the results in descending order, and prints the counts.
+
+Run the script:
+
+```bash
+./food_count.py
+```
+
+### Sample output
+
+```text
+rice, 12
+burgers, 10
+fried chicken, 9
+pie, 8
+pizza, 7
+salad, 7
+tacos, 6
+avocados, 6
+spaghetti, 5
+broccoli, 5
+ice cream, 5
+bananas, 5
+fish, 4
+cake, 3
+cereal, 3
+strawberries, 3
+watermelon, 2
+Favourite foods, from most popular to least popular
+```
+
+**Result:** Rice was the most frequently listed food, appearing 12 times. Watermelon appeared twice.
+
+## 2. Debugging `food_question.py`
+
+Initially, running the script produced this error:
+
+```text
+NameError: name 'item' is not defined.
+Did you mean: 'iter'?
+```
+
+The script used the variable `food_item` while reading the file, but some dictionary operations incorrectly referred to `item`.
+
+### Fix applied
+
+The incorrect variable references were changed to `food_item`:
+
+```python
+if food_item not in counter:
+    counter[food_item] = 1
+else:
+    counter[food_item] += 1
+```
+
+This ensures that the dictionary counts each food using the correct variable.
+
+### Run the corrected script
+
+```bash
+python3 food_question.py
+```
+
+### Successful output
+
+```text
+Select your favorite food below:
+pie
+burgers
+pizza
+tacos
+fried chicken
+spaghetti
+rice
+cake
+broccoli
+cereal
+salad
+avocados
+ice cream
+fish
+strawberries
+bananas
+watermelon
+
+Which of the foods above is your favorite? pizza
+7 of your friends like pizza as well!
+```
+
+**Result:** The script successfully accepted `pizza` as input and reported that 7 friends also liked it.
+
+## 3. Git Version Control
+
+Git was used to track script improvements and maintain the project's history.
+
+### Check repository status
+
+```bash
+git status
+```
+
+The terminal confirmed that the working tree was clean at the time of the check.
+
+### Review commit history
+
+```bash
+git log
+```
+
+Important commits included:
+
+- Added `favorite_foods.log` containing the food list.
+- Added `food_count.py` to count food preferences.
+- Added `food_question.py` to report how many others like a selected food.
+- Renamed a variable to `food_item`.
+- Added a descriptive line to the `food_count.py` output.
+- Fixed remaining `NameError` instances in `food_question.py`.
+
+## 4. Git Branching and Merging
+
+The `improve-output` branch was used to improve the output of `food_count.py`.
+
+The change was committed with:
+
+```bash
+git add food_count.py
+git commit -m "Adding a line in the output describing the utility of food_count.py script"
+```
+
+The branch was then merged into `master`:
+
+```bash
+git checkout master
+git merge improve-output
+```
+
+The terminal confirmed a successful fast-forward merge:
+
+```text
+Updating 21cf376..bb2e4dd
+Fast-forward
+ food_count.py | 1 +
+ 1 file changed, 1 insertion(+)
+```
+
+## 5. Skills Demonstrated
+
+- Reading files in Python.
+- Using dictionaries to count repeated values.
+- Sorting dictionary entries by their counts.
+- Accepting interactive user input.
+- Debugging `NameError` exceptions.
+- Using `git status`, `git diff`, `git add`, `git commit`, and `git log`.
+- Working with Git branches and merging changes.
+
+## Conclusion
+
+This lab demonstrated how to analyze food preference data with Python, troubleshoot variable-name errors, and manage code changes using Git. Both scripts produced the expected results after the variable references in `food_question.py` were corrected, and the output improvement was merged into the `master` branch.
+
+The project provided practical experience with Python dictionaries, file handling, debugging, and version control.
