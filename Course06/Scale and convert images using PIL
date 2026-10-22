@@ -1,0 +1,132 @@
+# Image Manipulation with Python and Pillow
+
+A Python automation script designed to batch-process a collection of user interface icons. This script was built as part of an automated image processing pipeline challenge.
+
+## Overview
+
+The script scans a source directory containing raw high-resolution icons, applies specific geometric transformations, and exports them to a unified deployment folder in a standardized web format.
+
+### Target Objectives
+1. **Iterate** through all assets inside an unzipped source directory.
+2. **Rotate** each raw icon image **90° clockwise**.
+3. **Resize** the resolution smoothly from **192x192 pixels** down to **128x128 pixels**.
+4. **Convert** the underlying image modes (handling alpha transparency layers) into standard `RGB`.
+5. **Save** the output files in **JPEG format** directly to the target directory: `/opt/icons/`.
+
+---
+
+## Technical Pipeline & Transformations
+
+The image processing flow handles transparency safety barriers before compression:
+
+Use code with caution.
+[ Input Icon: 192x192 (RGBA) ]
+│
+▼
+( Rotate 90° CW )
+│
+▼
+( Resize to 128x128 )
+│
+▼
+[ Convert RGBA ➔ RGB ]  <-- Avoids distortion errors on JPEG export
+│
+▼
+[ Output Icon: 128x128 (JPEG) ]
+
+### Direct Visual Comparison Preview
+
+| Transformation | Before Processing | After Processing |
+| :--- | :---: | :---: |
+| **Dimensions** | `192 x 192` | `128 x 128` |
+| **Rotation** | 0° (Standard orientation) | 90° Clockwise |
+| **Format & Mode** | Custom / Alpha (`RGBA` / `P`) | Compressed (`JPEG`, `RGB`) |
+| **Visual Sample** | 📍 (*Upright Pointer*) | 📍 (*Rotated Right*) |
+
+---
+
+## Installation & Script Usage
+
+### 1. Prerequisites
+Ensure you have Python 3 and the Pillow (PIL) library installed on your system:
+```bash
+sudo apt-get update
+sudo apt-get install python3-pil -y
+```
+
+### 2. Environment Setup
+Extract the lab assets into your workspace directory:
+```bash
+unzip images.zip
+```
+
+### 3. Creating the Script
+Open a terminal text window using the `nano` editor:
+```bash
+nano process_images.py
+```
+Paste the following complete Python processing logic inside:
+
+```python
+#!/usr/bin/env python3
+import os
+from PIL import Image
+
+# Setup file pipeline paths
+source_dir = "images"
+output_dir = "/opt/icons/"
+
+# Automatically build output path if missing
+os.makedirs(output_dir, exist_ok=True)
+
+print(f"Beginning image migration from '{source_dir}' to '{output_dir}'...")
+
+for filename in os.listdir(source_dir):
+    file_path = os.path.join(source_dir, filename)
+    
+    # Bypass system directories or hidden metadata files
+    if os.path.isdir(file_path) or filename.startswith('.'):
+        continue
+
+    try:
+        with Image.open(file_path) as img:
+            # Chain transformations: Rotate 90° CW (270° CCW) -> Downsize -> Flatten Transparency
+            processed_img = img.rotate(270).resize((128, 128)).convert("RGB")
+            
+            # Export out to target directory keeping the original reference string
+            output_path = os.path.join(output_dir, filename)
+            processed_img.save(output_path, "JPEG")
+            
+    except Exception as e:
+        print(f"Skipping incompatible asset {filename}: {e}")
+
+print("Batch processing pipeline executed successfully!")
+```
+
+Save and exit `nano` using:
+* `Ctrl + O` ➔ `Enter` (Save changes)
+* `Ctrl + X` (Exit editor)
+
+### 4. Running the Processor
+Elevate script permissions to allow file execution, then run it:
+```bash
+chmod +x process_images.py
+./process_images.py
+```
+
+---
+
+## Verification
+
+To verify that the script successfully generated the icons into the correct location, list the target root:
+```bash
+ls /opt/icons
+```
+
+Validate format consistency and dimensions natively inside the interactive Python shell:
+```python
+from PIL import Image
+img = Image.open("/opt/icons/ic_edit_location_black_48dp")
+print(img.format, img.size)
+# Output should strictly match: ('JPEG', (128, 128))
+```
