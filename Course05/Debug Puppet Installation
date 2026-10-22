@@ -1,0 +1,104 @@
+#!/bin/bash
+# ==============================================================================
+# Repository Setup: Debug Puppet Installation Lab
+# ==============================================================================
+
+set -e
+
+echo "[*] Creating lab documentation (README.md)..."
+cat << 'EOF' > README.md
+# Debug Puppet Installation - Lab Walkthrough
+
+This repository documents the troubleshooting and resolution of a misbehaving Puppet profile configuration during the **[Debug Puppet Installation](https://www.skills.google/focuses/50000183?parent=lti_session)** lab on Google Skills.
+
+## Scenario & Objective
+A custom Puppet script under the production environment (`profile` module) was completely overwriting the system `$PATH` environment variable instead of appending to it, breaking standard execution binaries like `ls`, `cd`, and `rm`. The objective was to debug the manifest file (`init.pp`), correct the `$PATH` logic, secure file permissions, and verify automation execution using the Puppet agent.
+
+---
+
+## Technical Troubleshooting & Resolution
+
+### 1. Initial Access & PATH Restoration
+Upon SSH connection, core binaries were inaccessible due to an incomplete `$PATH`. The path was temporarily restored to execute administrative commands:
+```bash
+export PATH=/bin:/usr/bin
+2. Manifest Inspection
+Navigated to the Puppet production module directory and inspected the faulty class definition:
+
+Bash
+cd /etc/puppet/code/environments/production/modules/profile/manifests
+cat init.pp
+Original Faulty Configuration (init.pp):
+
+Puppet
+class profile {
+        file { '/etc/profile.d/append-path.sh':
+                owner   => 'root',
+                group   => 'root',
+                mode    => '0646',
+                content => "PATH=/java/bin\n",
+        }
+}
+3. Implementing the Fix
+Updated init.pp to:
+
+Securely append /java/bin to the existing shell path using an escaped variable reference (\$PATH:/java/bin).
+
+Harden file permissions from an insecure 0646 to 0644 (restricting write access solely to the root user).
+
+Corrected Configuration (init.pp):
+
+Puppet
+class profile {
+        file { '/etc/profile.d/append-path.sh':
+                owner   => 'root',
+                group   => 'root',
+                mode    => '0644',
+                content => "PATH=\$PATH:/java/bin\n",
+        }
+}
+4. Applying and Verifying Configuration
+Triggered a manual local run of the Puppet agent to compile and enforce the catalog:
+
+Bash
+sudo puppet agent -v --test
+Verified the environment variable successfully loaded all system paths alongside /java/bin in a secondary session:
+
+Bash
+echo $PATH
+Expected Output:
+
+Plaintext
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/java/bin
+Lab Metrics & Completion
+Score: 5 / 5 (100%)
+
+Status: Verified and Completed Successfully.
+EOF
+
+echo "[*] Creating automated remediation script (fix_puppet.sh)..."
+cat << 'EOF' > fix_puppet.sh
+#!/bin/bash
+
+Automation Script for Debug Puppet Installation Lab
+export PATH=/bin:/usr/bin
+cd /etc/puppet/code/environments/production/modules/profile/manifests
+
+sudo tee init.pp > /dev/null << 'INNER_EOF'
+class profile {
+file { '/etc/profile.d/append-path.sh':
+owner   => 'root',
+group   => 'root',
+mode    => '0644',
+content => "PATH=$PATH:/java/bin\n",
+}
+}
+INNER_EOF
+
+sudo puppet agent -v --test
+echo "[*] Puppet configuration applied successfully."
+EOF
+
+chmod +x fix_puppet.sh
+
+echo "[*] Setup complete! README.md and fix_puppet.sh have been generated successfully."
