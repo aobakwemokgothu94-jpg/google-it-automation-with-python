@@ -1,0 +1,105 @@
+# Automatically Processing Feedback and Uploading to Web Service
+
+An automation script that structures semi-structured customer reviews from plaintext files into standardized JSON payloads and transmits them automatically via a REST API to a running Django web application.
+
+## Overview
+
+The automation scripts process independent customer text reviews stored inside a storage directory, structure the information into fields dynamically, and perform bulk programmatic updates to populate the company's live server endpoint.
+
+### Script Operations
+1. **Traverse** a target directory containing multiple un-delimited review text entries.
+2. **Parse** content structure linearly line-by-line into structured fields:
+   * **Line 1:** Title
+   * **Line 2:** Customer/Reviewer Name
+   * **Line 3:** Timestamp / Date
+   * **Line 4+:** Complete body text describing feedback or interaction details.
+3. **Map** extracted text parameters smoothly into data collections (dictionaries/JSON objects).
+4. **Transmit** the packaged payload cleanly via an automated network call to the REST framework endpoint (`http://34.82.155`).
+
+---
+
+## Workspace Setup & Execution Guide
+
+Due to strict buffer limitations inside some browser terminal configurations that cause long IP address text inputs to truncate (frequently dropping parts of strings like `.241/feedback/`), you can use automated shell manipulation commands to construct your script securely.
+
+### Implementation Steps
+
+#### 1. Generate the Python automation template
+Run this block to write out the basic structure without character overflow dropouts:
+```bash
+cat << 'EOF' > ~/run.py
+#!/usr/bin/env python3
+import os
+import requests
+
+feedback_dir = "/data/feedback"
+url = "http://34.82.155"
+
+for filename in os.listdir(feedback_dir):
+    if filename.startswith('.'):
+        continue
+        
+    file_path = os.path.join(feedback_dir, filename)
+    if os.path.isfile(file_path):
+        with open(file_path, "r", encoding="utf-8") as file:
+            lines = [line.strip() for line in file.readlines()]
+            
+            feedback_dict = {
+                "title": lines[0],
+                "name": lines[1],
+                "date": lines[2],
+                "feedback": " ".join(lines[3:])
+            }
+            
+            try:
+                response = requests.post(url, json=feedback_dict)
+                if response.status_code == 201:
+                    print(f"Successfully uploaded {filename}")
+                else:
+                    print(f"Failed to upload {filename}. Status Code: {response.status_code}")
+            except Exception as e:
+                print(f"Network error on {filename}: {e}")
+EOF
+```
+
+#### 2. Inject the complete target IP dynamically
+Use an inline stream text modifier to stitch the full destination endpoint string back into place, avoiding clipboard truncation blocks:
+```bash
+sed -i 's|url = ".*"|url = "http://34.82.155" + ".241/feedback/"|g' ~/run.py
+```
+
+#### 3. Update execution parameters and run
+Authorize execute permissions and trigger your file processing pipeline loop:
+```bash
+chmod +x ~/run.py
+~/run.py
+```
+
+---
+
+## Technical Comparison Overview
+
+This system can be written in either **Python** (using the `requests` library) or as an optimized **Bash** wrapper (using `curl`). Below is how both patterns handle data formatting and submission:
+
+| Operational Dimension | Python Pipeline (`run.py`) | Bash Alternative (`run.sh`) |
+| :--- | :--- | :--- |
+| **Directory Traversal** | `os.listdir()` matrix array scanning | File descriptor glob loop (`for f in .../*`) |
+| **Line Manipulation** | Slices by index (`lines[0]`, `lines[3:]`) | Precision text stream piping (`sed -n '1p'`) |
+| **Data Formatting** | Native JSON key-value mapping objects | Escaped character payload serialization strings |
+| **Transmission Protocol** | `requests.post(url, json=...)` | Multi-header curl query (`curl -X POST -H ...`) |
+| **Target Success Code** | `201 Created` HTTP Response status | `201` HTTP Response validation output |
+
+---
+
+## Validation Trace
+
+A successful deployment sequence should trigger the following log confirmations on standard output:
+
+Use code with caution.
+Successfully uploaded 001.txt
+Successfully uploaded 005.txt
+Successfully uploaded 007.txt
+Successfully uploaded 019.txt
+Successfully uploaded 020.txt
+
+Verify that the dashboard tracks your upload correctly by refreshing your instance server tab at `http://34.82.155` to confirm that all customer feedback records render perfectly within the live Django framework architecture interface.
